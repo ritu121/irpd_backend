@@ -1,0 +1,22 @@
+{
+  "name": "irpd-services",
+  "version": "1.0.0",
+  "description": "",
+  "main": "irpd_app.js",
+  "scripts": {
+    "start": "nodemon irpd_app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^15.0.1",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.5.2",
+    "nodemon": "^2.0.15"
+  }
+}
