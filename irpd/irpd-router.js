@@ -17,7 +17,13 @@ const {
   getResume,
   addcandidateResume,
   getPrevious_Exp,
-  updatecandidateResume
+  updatecandidateResume,  
+  getJobByStatus,
+  getAllCandidateByJob,
+  getSkills,
+  addSkills,
+  updateSkills,
+  deleteSkills
 } = require("./irpd-controller");
 
 const multer = require('multer');
@@ -46,6 +52,7 @@ router.delete("/deleteUser", deleteUser);
 
 // --JobsRoute
 router.get("/getJobs", getJobs);
+router.get("/getJobByStatus", getJobByStatus);
 router.post("/addJob", addJob);
 router.patch("/updateJob", updateJob);
 router.delete("/deleteJob", deleteJob);
@@ -53,11 +60,20 @@ router.delete("/deleteJob", deleteJob);
 // ---Search
 router.get("/search", getJobsearch);
 
+
 //----Candidates
 router.get("/getCandidates", getCandidates);
 router.post("/addCandidates",addCandidates);
 router.patch("/updateCandidates", updateCandidates);
 router.delete("/deleteCandidates/:id", deleteCandidates);
+
+
+//----Skills
+router.get("/getSkills", getSkills);
+router.post("/addSkills", addSkills);
+router.patch("/updateSkills", updateSkills);
+router.delete("/deleteSkills/:id", deleteSkills);
+
 
 //----getPreview Experience
 router.get("/getPrevious_Exp/:candidate_id", getPrevious_Exp);
@@ -68,5 +84,11 @@ router.get("/getPrevious_Exp/:candidate_id", getPrevious_Exp);
 router.get("/download/:filename", getResume);
 router.post("/addCandidatesResume",upload.single('file'), addcandidateResume);
 router.patch("/updateCandidatesResume/:filename", upload.single('file'), updatecandidateResume);
+
+
+router.get("/getCandidateByJob/:job_id",getAllCandidateByJob)
+
+
+
 
 module.exports = router;   

@@ -73,7 +73,9 @@ module.exports = {
 
     try {
 
-      var qr1 = `SELECT * FROM tbl_jobs WHERE job_title LIKE '%${name}%'`;
+      var qr1 = `SELECT * FROM tbl_jobs WHERE budget LIKE '%${name}%' OR job_title LIKE '%${name}%' OR job_description LIKE '%${name}%' OR edu_qualification LIKE '%${name}%' OR skills LIKE '%${name}%' OR certifications LIKE '%${name}%' OR hire_type LIKE '%${name}%' OR status LIKE '%${name}%' OR client_name LIKE '%${name}%' OR no_of_positions LIKE '%${name}%' OR job_id LIKE '%${name}%'`;
+     
+      
       var qr1_res = await new Promise((res, rej) => {
         connect_pool.query(qr1, [name],
           (result1_err, results_1) => {
@@ -85,7 +87,7 @@ module.exports = {
             res([results_1]);
           });
       });
-      if (qr1_res.length == 0) {
+      if (qr1_res.length == 0) {   
         return callBack({ status: 0, message: "No records found" })
       }
       await connection.commit();
@@ -290,6 +292,41 @@ module.exports = {
     }
   },
   //Jobs-services
+
+  get_JobByStatus: async (status, callBack) => {
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+
+    try {
+
+      var qr1 = `SELECT * FROM tbl_jobs WHERE status = '${status}'`;
+      
+      var qr1_res = await new Promise((res, rej) => {
+        connect_pool.query(qr1, [status],
+          (result1_err, results_1) => {
+
+            if (result1_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result1_err });
+            }
+            res([results_1]);
+          });
+      });
+      if (qr1_res.length == 0) {
+        return callBack({ status: 0, message: "No records found" })
+      }
+      await connection.commit();
+      await connection.end();
+      return callBack(null, qr1_res)
+    }
+    catch (err) {
+      await connection.rollback()
+      // connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  },   
+
+  
   get_jobs: async (pageSize, offset, callBack) => {
 
     const connection = await mysql.createConnection(db_conn);
@@ -363,23 +400,23 @@ module.exports = {
     await connection.beginTransaction();
     try {
 
-      var qr2_res = await new Promise((res, rej) => {
-        connect_pool.query(qr2, [body.job_id], (row2_err, row2) => {
+      // var qr2_res = await new Promise((res, rej) => {
+      //   connect_pool.query(qr2, [body.job_id], (row2_err, row2) => {
 
-          if (row2_err) {
-            connection.rollback(); return callBack({ status: 0, message: row2_err });
-          }
-          res(row2);
-        });
-      });
-      if (qr2_res.length < 1) {
-        return callBack({ status: 0, message: "No user found" });
-      }
+      //     if (row2_err) {
+      //       connection.rollback(); return callBack({ status: 0, message: row2_err });
+      //     }
+      //     res(row2);
+      //   });
+      // });
+      // if (qr2_res.length < 1) {
+      //   return callBack({ status: 0, message: "No user found" });
+      // }
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [body.job_title, body.job_description, body.edu_qualification, body.budget, body.skills, body.year_of_experience, body.certifications, body.status, body.no_of_positions, body.hire_type, body.start_date, body.target_date, body.closed_date, body.client_name, body.location, body.job_id, body.user_id],
+        connect_pool.query(qr4, [body.job_title, body.job_description, body.edu_qualification, body.budget, body.skills, body.year_of_experience, body.certifications, body.status, body.no_of_positions, body.hire_type, body.start_date, body.target_date, body.closed_date, body.client_name, body.location, body.user_id, body.job_id],
           (result4_err, results_4) => {
-
+            
             if (result4_err) {
               connection.rollback();
               return callBack({ status: 0, message: result4_err });
@@ -489,7 +526,7 @@ module.exports = {
   add_candidates: async (body, callBack) => {
     // add_candidates: async (body,originalname, filename, path, callBack) => {
 
-    var qr1 = "INSERT INTO tbl_candidates (first_name,middle_name,last_name,key_skills,other_skills,year_of_experience,qualifications,permanent_address,current_address,notice_period,current_company,current_ctc,expected_ctc,designation,roles_and_responsibilities,start_date,last_work_date,user_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    var qr1 = "INSERT INTO tbl_candidates (first_name,middle_name,last_name,key_skills,other_skills,year_of_experience,qualifications,permanent_address,current_address,notice_period,current_company,current_ctc,expected_ctc,designation,roles_and_responsibilities,start_date,last_work_date,user_id,job_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     // var qr1 = "INSERT INTO tbl_candidates (originalname,filename, path,first_name,middle_name,last_name,key_skills,other_skills,year_of_experience,qualifications,permanent_address,current_address,notice_period,current_company,current_ctc,expected_ctc,designation,roles_and_responsibilities,start_date,last_work_date,user_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     var qr2 = "SELECT candidate_id FROM tbl_candidates WHERE first_name=? AND last_name=? ";
     var qr3 = "INSERT INTO tbl_candidate_prev_exp (candidate_id,company,designation,year_of_experience,roles_and_responsibilities,start_date,last_work_date) VALUES (?,?,?,?,?,?,?)";
@@ -511,7 +548,7 @@ module.exports = {
       //await connect_pool.beginTransaction()
       var qr1_res = await new Promise((res, rej) => {
         connect_pool.query(qr1,
-          [body.first_name, body.middle_name, body.last_name, body.key_skills, body.other_skills, body.year_of_experience, body.qualification, body.permanent_address, body.current_address, body.notice_period, body.current_company, body.current_ctc, body.expected_ctc, body.designation, body.roles_and_responsibilities, bodystartDate, bodylastWorkDate, body.user_id],
+          [body.first_name, body.middle_name, body.last_name, body.key_skills, body.other_skills, body.year_of_experience, body.qualifications, body.permanent_address, body.current_address, body.notice_period, body.current_company, body.current_ctc, body.expected_ctc, body.designation, body.roles_and_responsibilities, bodystartDate, bodylastWorkDate, body.user_id, body.job_id],
           // [originalname,filename,path,body.first_name,body.middle_name,body.last_name,body.key_skills,body.other_skills,body.year_of_experience,body.qualifications,body.permanent_address,body.current_address,body.notice_period,body.current_company,body.current_ctc,body.expected_ctc,body.designation,body.roles_and_responsibilities,body.start_date,body.last_work_date,body.user_id],
           (row1_err, row1) => {
 
@@ -578,8 +615,7 @@ module.exports = {
 
     var qr2 = "SELECT * FROM tbl_candidates WHERE candidate_id = ?";
     var qr3 = "DELETE FROM tbl_candidate_prev_exp WHERE candidate_id = ?";
-    var qr4 = "UPDATE tbl_candidates SET first_name= ?,middle_name=?,last_name=?,key_skills=?,other_skills=?,year_of_experience=?,qualifications=? ,permanent_address=?,current_address=?,notice_period=?,current_company=?,current_ctc=?,expected_ctc=?,designation=?,roles_and_responsibilities=?,start_date=?,last_work_date=? ,user_id = ?  WHERE candidate_id = ?";
-
+    var qr4 = "UPDATE tbl_candidates SET first_name= ?,middle_name=?,last_name=?,key_skills=?,other_skills=?,year_of_experience=?,qualifications=? ,permanent_address=?,current_address=?,notice_period=?,current_company=?,current_ctc=?,expected_ctc=?,designation=?,roles_and_responsibilities=?,start_date=?,last_work_date=? ,user_id = ?,job_id =?  WHERE candidate_id = ?";
 
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
@@ -594,7 +630,7 @@ module.exports = {
 
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [body.first_name, body.middle_name, body.last_name, body.key_skills, body.other_skills, body.year_of_experience, body.qualifications, body.permanent_address, body.current_address, body.notice_period, body.current_company, body.current_ctc, body.expected_ctc, body.designation, body.roles_and_responsibilities, bodystartDate, bodylastWorkDate, body.user_id, body.candidate_id],
+        connect_pool.query(qr4, [body.first_name, body.middle_name, body.last_name, body.key_skills, body.other_skills, body.year_of_experience, body.qualifications, body.permanent_address, body.current_address, body.notice_period, body.current_company, body.current_ctc, body.expected_ctc, body.designation, body.roles_and_responsibilities, bodystartDate, bodylastWorkDate, body.user_id, body.job_id, body.candidate_id],
           (result4_err, results_4) => {
             if (result4_err) {
               connection.rollback();
@@ -665,84 +701,6 @@ module.exports = {
       return callBack({ status: 0, message: err });
     }
   },
-
-
-  // Increase start_date and last_work_date by one day
-
-  // update_candidates: async (body, callBack) => {
-  //   var qr2 = "SELECT * FROM tbl_candidates WHERE candidate_id = ?";
-  //   var qr3 = "DELETE FROM tbl_candidate_prev_exp WHERE candidate_id = ?";
-  //   var qr4 = "UPDATE tbl_candidates SET first_name=?, middle_name=?, last_name=?, key_skills=?, other_skills=?, year_of_experience=?, qualifications=?, permanent_address=?, current_address=?, notice_period=?, current_company=?, current_ctc=?, expected_ctc=?, designation=?, roles_and_responsibilities=?, start_date=?, last_work_date=?, user_id=?  WHERE candidate_id = ?";
-
-  //   const connection = await mysql.createConnection(db_conn);
-  //   await connection.beginTransaction();
-
-  //   let bodystartDate = new Date(body.start_date);
-  //   let bodylastWorkDate = new Date(body.last_work_date);
-
-  //   // Increase start_date and last_work_date by one day
-  //   bodystartDate.setDate(bodylastWorkDate.getDate() + 1);
-  //   bodylastWorkDate.setDate(bodylastWorkDate.getDate() + 1);
-
-  //   try {
-  //     var qr4_res = await new Promise((res, rej) => {
-  //       connect_pool.query(qr4, [body.first_name, body.middle_name, body.last_name, body.key_skills, body.other_skills, body.year_of_experience, body.qualifications, body.permanent_address, body.current_address, body.notice_period, body.current_company, body.current_ctc, body.expected_ctc, body.designation, body.roles_and_responsibilities, bodystartDate, bodylastWorkDate, body.user_id, body.candidate_id], async (result4_err, results_4) => {
-  //         if (result4_err) {
-  //           connection.rollback();
-  //           return callBack({ status: 0, message: result4_err });
-  //         }
-
-  //         try {
-  //           connect_pool.query(qr3, [body.candidate_id], async (row2_err, row2) => {
-  //             if (row2_err) {
-  //               connection.rollback();
-  //               return callBack({ status: 0, message: row2_err });
-  //             }
-
-  //             for (let prevExp_data of body.previous_experience) {
-  //               try {
-
-  //                 // Convert start_date and last_work_date to JavaScript Date objects
-  //                 let startDate = new Date(prevExp_data.start_date);
-  //                 let lastWorkDate = new Date(prevExp_data.last_work_date);
-
-  //                 // Increase start_date and last_work_date by one day
-  //                 startDate.setDate(startDate.getDate() + 1);
-  //                 lastWorkDate.setDate(lastWorkDate.getDate() + 1);
-
-  //                 await connect_pool.query(
-  //                   `INSERT INTO tbl_candidate_prev_exp (candidate_id, company, designation, year_of_experience, roles_and_responsibilities, start_date, last_work_date) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  //                   [body.candidate_id, prevExp_data.company, prevExp_data.designation, prevExp_data.year_of_experience, prevExp_data.roles_and_responsibilities, startDate, lastWorkDate],
-  //                   (row2_err, row2) => {
-  //                     if (row2_err) {
-  //                       connection.rollback();
-  //                       return callBack({ status: 0, message: row2_err });
-  //                     }
-  //                   }
-  //                 );
-  //               } catch (err) {
-  //                 connection.rollback();
-  //                 return callBack({ status: 0, message: err });
-  //               }
-  //             }
-  //             res(results_4);
-  //           });
-  //         } catch (err) {
-  //           return callBack({ status: 0, message: err });
-  //         }
-  //       });
-  //     });
-
-  //     await connection.commit();
-  //     await connection.end();
-
-  //     return callBack(null, { status: 1, message: "Your have updated job successfully" });
-  //   } catch (err) {
-  //     await connection.rollback();
-  //     return callBack({ status: 0, message: err });
-  //   }
-  // },
-
 
 
   delete_candidates: async (id, callBack) => {
@@ -853,5 +811,193 @@ module.exports = {
       return callBack({ status: 0, message: err });
     }
   },
- 
+
+  getCandidateByJob:async(id, callBack)=>{
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+    try {
+      var qr1 = `SELECT c.* FROM tbl_jobs job LEFT JOIN tbl_candidates AS c ON c.job_id = job.job_id WHERE job.job_id =?`;
+      var qr1_res = await new Promise((res, rej) => {
+        connect_pool.query(qr1, [id],
+          (result1_err, results_1) => {
+            if (result1_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result1_err });
+            }
+            res([results_1]);
+          });
+      });
+      if (qr1_res.length == 0) {
+        return callBack({ status: 0, message: "No records found" })
+      }
+      await connection.commit();
+      await connection.end();
+      return callBack(null, qr1_res)
+    }
+    catch (err) {
+      await connection.rollback()
+      // connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  },
+
+// Skills====================================================================
+
+  get_skills: async (callBack) => {
+
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+
+    try {
+
+      var qr1 = `SELECT * FROM skills`;
+      var qr1_res = await new Promise((res, rej) => {
+        connect_pool.query(qr1,
+          (result1_err, results_1) => {
+            if (result1_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result1_err});
+            }
+            res(results_1);
+          });
+      });
+      if (qr1_res.length == 0) {
+        return callBack({ status: 0, message: "No records found" })
+      }
+      await connection.commit();
+      await connection.end();
+      return callBack(null, qr1_res)
+    }
+    catch (err) {
+      await connection.rollback()
+      // connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  },
+
+
+  add_skills: async (body, callBack) => {
+    var qr1 = "INSERT INTO skills (skill_name) VALUES (?)";
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+    try {
+
+      //await connect_pool.beginTransaction()
+      var qr1_res = await new Promise((res, rej) => {
+        connect_pool.query(qr1,
+          [body.skill_name],
+          (row1_err, row1) => {
+            if (row1_err) {
+              connection.rollback(); return callBack({ status: 0, message: row1_err });
+            }
+            res(row1);
+          });
+      });
+
+      connection.commit();
+      connection.end();
+      let res_obj = {
+        "result": qr1_res,
+      }
+      return callBack(null, res_obj)
+    } catch (err) {
+      //connection.rollback();
+      //connection.releaseConnection();
+      return callBack({ status: 0, message: err })
+    }
+  },
+
+
+  update_skills: async (body, callBack) => {
+
+    var qr2 = "SELECT * FROM skills WHERE skill_id = ?";
+    var qr4 = "UPDATE skills SET skill_name = ? WHERE skill_id = ?";
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+    try {
+
+      var qr2_res = await new Promise((res, rej) => {
+        connect_pool.query(qr2, [body.skill_id], (row2_err, row2) => {
+
+          if (row2_err) {
+            connection.rollback(); return callBack({ status: 0, message: row2_err });
+          }
+          res(row2);
+        });
+      });
+      if (qr2_res.length < 1) {
+        return callBack({ status: 0, message: "No user found" });
+      }
+
+      var qr4_res = await new Promise((res, rej) => {
+        connect_pool.query(qr4, [body.skill_name],
+          (result4_err, results_4) => {
+
+            if (result4_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result4_err });
+            }
+            res(results_4);
+          });
+      });
+      await connection.commit();
+      await connection.end();
+
+      return callBack(null, { status: 1, message: "You have updated skill sucussesfully" })
+    }
+    catch (err) {
+      await connection.rollback()
+      //connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  },
+
+  delete_skills: async (body, callBack) => {
+
+    var qr2 = "SELECT * FROM tbl_users WHERE user_id = ?";
+    var qr4 = "DELETE FROM tbl_users WHERE user_id = ?";
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+    try {
+
+      var qr2_res = await new Promise((res, rej) => {
+        connect_pool.query(qr2, [body.user_id], (row2_err, row2) => {
+
+          if (row2_err) {
+            connection.rollback(); return callBack({ status: 0, message: row2_err });
+          }
+          res(row2);
+        });
+      });
+      if (qr2_res.length < 1) {
+        return callBack({ status: 0, message: "No user found" });
+      }
+
+      var qr4_res = await new Promise((res, rej) => {
+        connect_pool.query(qr4, [body.user_id],
+          (result4_err, results_4) => {
+
+            if (result4_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result4_err });
+            }
+            res(results_4);
+          });
+      });
+      await connection.commit();
+      await connection.end();
+
+      return callBack(null, { status: 1, message: "Your have deleted the user sucussesfully" })
+    }
+    catch (err) {
+      await connection.rollback()
+      //connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  }
+
+
 };
+
+
+

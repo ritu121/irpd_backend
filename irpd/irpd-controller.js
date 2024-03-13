@@ -16,6 +16,13 @@ const {
   delete_candidates,
   add_candidates_resume,
   get_previous_exp,
+  get_JobByStatus,
+  getCandidateByJob,
+  get_skills,
+  add_skills,
+  update_skills,
+  delete_skills
+
 } = require("./irpd-service");
 
 const fs = require('fs');
@@ -251,6 +258,32 @@ module.exports = {
     }
   },
   //JobsController
+
+  getJobByStatus:(req, res) => {
+    
+    const status = req.query.status;
+    var oldSend = res.send;
+    res.send = function (response) {
+      // add_log(response)
+      oldSend.apply(res, arguments);
+    }
+    try {
+      get_JobByStatus(status, (err, results) => {
+        // console.log(results);
+        if (err) {
+          return res.status(500).json(err);
+        }
+        return res.status(200).json({ "status": 1, data: results[0] });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+
+
   getJobs: (req, res) => {
     var oldSend = res.send;
 
@@ -449,7 +482,7 @@ module.exports = {
     if (body.length < 1) {
       return res.status(201).json({
         status: 0,
-        message: "Please provide Candidates details ",
+        message: "Please provide Candidates details",
       });
     }
     try {
@@ -471,13 +504,13 @@ module.exports = {
   deleteCandidates: (req, res) => {
     const id = req.params.id;
     var oldSend = res.send;
-
+   
     res.send = function (response) {
       // add_log(body, response)
       oldSend.apply(res, arguments);
     }
 
-   
+      
     try {
       delete_candidates(id, (err, results) => {
 
@@ -582,10 +615,6 @@ module.exports = {
   updatecandidateResume: (req, res) => {
     const { originalname, filename,path } = req.file;
     const prev_file=req.params.filename
-    console.log('====================================');
-    console.log(prev_file,'----',originalname, filename,path);
-    console.log('====================================');
-  
     const body = req.body;
    
     try {
@@ -634,6 +663,154 @@ module.exports = {
       res.status(404).send('File not found');
     }
 
+  },
+  getAllCandidateByJob: (req, res) => {
+    const id = req.params.job_id;
+    var oldSend = res.send;
+    res.send = function (response) {
+      // add_log(response)
+      oldSend.apply(res, arguments);
+    }
+    try {
+      getCandidateByJob(id, (err, results) => {
+        // console.log(results);
+        if (err) {
+          return res.status(500).json(err);
+        }
+        return res.status(200).json({ "status": 1, data: results[0] });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+
+  // Skills==================================
+
+
+  getSkills: (req, res) => {
+    var oldSend = res.send;
+
+    res.send = function (response) {
+      // add_log(response)
+      oldSend.apply(res, arguments);
+    }
+
+    try {
+      const page = parseInt(req.query.page) || 1
+      const pageSize = parseInt(req.query.pageSize) || 10
+
+      const offset = (page - 1) * pageSize
+
+      get_skills((err, results) => {
+
+        if (err) {
+
+          return res.status(500).json(err);
+        }
+
+        return res.status(200).json(results);
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+
+  addSkills: (req, res) => {
+    const body = req.body;
+    var oldSend = res.send;
+    res.send = function (response) {
+      // add_log(body, response)
+      oldSend.apply(res, arguments);
+    }
+
+    try {
+      add_skills(body, (err, results) => {
+
+        if (err) {
+          return res.status(500).json({ err });
+        }
+        return res.status(200).json({
+          status: 1,
+          message: "skill Added sucessfully",
+          data: results,
+        });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+
+  },
+
+
+  updateSkills: (req, res) => {
+    const body = req.body;
+    var oldSend = res.send;
+    res.send = function (response) {
+      // add_log(body, response)
+      oldSend.apply(res, arguments);
+    }
+
+    if (body.length < 1) {
+      return res.status(201).json({
+        status: 0,
+        message: "Please provide Job details ",
+      });
+    }
+    try {
+      update_skills(body, (err, results) => {
+
+        if (err) {
+
+          return res.status(500).json(err);
+        }
+        return res.status(200).json(results);
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+  deleteSkills: (req, res) => {
+    const body = req.body;
+    var oldSend = res.send;
+
+    res.send = function (response) {
+      // add_log(body, response)
+      oldSend.apply(res, arguments);
+    }
+
+    if (body.length < 1) {
+      return res.status(201).json({
+        status: 0,
+        message: "Please provide job details ",
+      });
+    }
+    try {
+      delete_skills(body, (err, results) => {
+
+        if (err) {
+
+          return res.status(500).json(err);
+        }
+        return res.status(200).json(results);
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
   },
 
 
