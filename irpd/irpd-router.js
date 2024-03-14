@@ -71,7 +71,7 @@ router.delete("/deleteCandidates/:id", deleteCandidates);
 //----Skills
 router.get("/getSkills", getSkills);
 router.post("/addSkills", addSkills);
-router.patch("/updateSkills", updateSkills);
+router.patch("/updateSkills/:id", updateSkills);
 router.delete("/deleteSkills/:id", deleteSkills);
 
 

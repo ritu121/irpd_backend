@@ -752,24 +752,16 @@ module.exports = {
 
 
   updateSkills: (req, res) => {
-    const body = req.body;
+    const skill_id = req.params.id;
     var oldSend = res.send;
     res.send = function (response) {
       // add_log(body, response)
       oldSend.apply(res, arguments);
     }
-
-    if (body.length < 1) {
-      return res.status(201).json({
-        status: 0,
-        message: "Please provide Job details ",
-      });
-    }
+    const body = req.body
     try {
-      update_skills(body, (err, results) => {
-
+      update_skills(body, skill_id, (err, results) => {
         if (err) {
-
           return res.status(500).json(err);
         }
         return res.status(200).json(results);
@@ -781,8 +773,10 @@ module.exports = {
       });
     }
   },
+
+
   deleteSkills: (req, res) => {
-    const body = req.body;
+    const skill_id = req.params.id;
     var oldSend = res.send;
 
     res.send = function (response) {
@@ -790,14 +784,8 @@ module.exports = {
       oldSend.apply(res, arguments);
     }
 
-    if (body.length < 1) {
-      return res.status(201).json({
-        status: 0,
-        message: "Please provide job details ",
-      });
-    }
     try {
-      delete_skills(body, (err, results) => {
+      delete_skills(skill_id, (err, results) => {
 
         if (err) {
 

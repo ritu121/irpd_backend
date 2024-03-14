@@ -908,7 +908,7 @@ module.exports = {
   },
 
 
-  update_skills: async (body, callBack) => {
+  update_skills: async (body,skill_id, callBack) => {
 
     var qr2 = "SELECT * FROM skills WHERE skill_id = ?";
     var qr4 = "UPDATE skills SET skill_name = ? WHERE skill_id = ?";
@@ -917,7 +917,7 @@ module.exports = {
     try {
 
       var qr2_res = await new Promise((res, rej) => {
-        connect_pool.query(qr2, [body.skill_id], (row2_err, row2) => {
+        connect_pool.query(qr2, [skill_id], (row2_err, row2) => {
 
           if (row2_err) {
             connection.rollback(); return callBack({ status: 0, message: row2_err });
@@ -930,7 +930,7 @@ module.exports = {
       }
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [body.skill_name],
+        connect_pool.query(qr4, [body.skill_name,skill_id],
           (result4_err, results_4) => {
 
             if (result4_err) {
@@ -952,16 +952,16 @@ module.exports = {
     }
   },
 
-  delete_skills: async (body, callBack) => {
+  delete_skills: async (skill_id, callBack) => {
 
-    var qr2 = "SELECT * FROM tbl_users WHERE user_id = ?";
-    var qr4 = "DELETE FROM tbl_users WHERE user_id = ?";
+    var qr2 = "SELECT * FROM skills WHERE skill_id = ?";
+    var qr4 = "DELETE FROM skills WHERE skill_id = ?";
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
 
       var qr2_res = await new Promise((res, rej) => {
-        connect_pool.query(qr2, [body.user_id], (row2_err, row2) => {
+        connect_pool.query(qr2, [skill_id], (row2_err, row2) => {
 
           if (row2_err) {
             connection.rollback(); return callBack({ status: 0, message: row2_err });
@@ -974,7 +974,7 @@ module.exports = {
       }
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [body.user_id],
+        connect_pool.query(qr4, [skill_id],
           (result4_err, results_4) => {
 
             if (result4_err) {
@@ -987,7 +987,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have deleted the user sucussesfully" })
+      return callBack(null, { status: 1, message: "Your have deleted the skill sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
