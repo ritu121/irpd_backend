@@ -291,7 +291,6 @@ module.exports = {
       // add_log(response)
       oldSend.apply(res, arguments);
     }
-
     try {
       const page = parseInt(req.query.page) || 1
       const pageSize = parseInt(req.query.pageSize) || 10
@@ -322,7 +321,6 @@ module.exports = {
       // add_log(body, response)
       oldSend.apply(res, arguments);
     }
-
     try {
       add_job(body, (err, results) => {
 

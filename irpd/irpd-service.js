@@ -392,10 +392,9 @@ module.exports = {
   },
 
   update_job: async (body, callBack) => {
-    console.log(body, "body");
 
     var qr2 = "SELECT * FROM tbl_jobs WHERE job_id = ?";
-    var qr4 = "UPDATE tbl_jobs SET job_title = ?, job_description = ?, edu_qualification = ?, budget = ?,skills = ?,year_of_experience = ?,certifications = ?,status = ?,no_of_positions = ?,hire_type = ?,start_date = ?,target_date = ?,closed_date = ?,client_name = ?,location = ? ,user_id = ?  WHERE job_id = ?";
+    var qr4 = "UPDATE tbl_jobs SET job_title = ?, job_description = ?, edu_qualification = ?, budget = ?,skills = ?,year_of_experience = ?,certifications = ?,status = ?,no_of_positions = ?,hire_type = ?,start_date = ?,target_date = ?,client_name = ?,location = ? ,user_id = ?  WHERE job_id = ?";
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
@@ -414,7 +413,7 @@ module.exports = {
       // }
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [body.job_title, body.job_description, body.edu_qualification, body.budget, body.skills, body.year_of_experience, body.certifications, body.status, body.no_of_positions, body.hire_type, body.start_date, body.target_date, body.closed_date, body.client_name, body.location, body.user_id, body.job_id],
+        connect_pool.query(qr4, [body.job_title, body.job_description, body.edu_qualification, body.budget, body.skills, body.year_of_experience, body.certifications, body.status, body.no_of_positions, body.hire_type, body.start_date, body.target_date, body.client_name, body.location, body.user_id, body.job_id],
           (result4_err, results_4) => {
             
             if (result4_err) {
