@@ -4,6 +4,7 @@ const {
   addUser,
   updateUser,
   deleteUser,
+  getroles,
   getJobs,
   addJob,
   updateJob,
@@ -59,6 +60,9 @@ router.delete("/deleteJob", deleteJob);
 
 // ---Search
 router.get("/search", getJobsearch);
+router.get("/roles", getroles);
+
+
 
 
 //----Candidates

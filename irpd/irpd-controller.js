@@ -4,6 +4,7 @@ const {
   add_user,
   update_user,
   delete_user,
+  get_roles,
   get_jobs,
   add_job,
   update_job,
@@ -102,6 +103,27 @@ module.exports = {
       });
     }
 
+  },
+
+  //roles
+
+  getroles: (req, res) => {
+
+    try {
+      get_roles((err, results) => {
+
+        if (err) {
+
+          return res.status(500).json(err);
+        }
+        return res.status(200).json({ "status": 1, data: results[0] });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
   },
   //UserController
   getUsers: (req, res) => {

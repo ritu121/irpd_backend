@@ -100,6 +100,38 @@ module.exports = {
       return callBack({ status: 0, message: err });
     }
   },
+
+  //roles
+
+  get_roles: async (callBack) => {
+
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+
+    try {
+
+      var qr1 = `SELECT * FROM tbl_roles`;
+      var qr1_res = await new Promise((res, rej) => {
+        connect_pool.query(qr1,
+          (result1_err, results_1) => {
+            if (result1_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result1_err });
+            }
+            res([results_1]);
+          });
+      });
+      
+      await connection.commit();
+      await connection.end();
+      return callBack(null, qr1_res)
+    }
+    catch (err) {
+      await connection.rollback()
+      // connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  },
   //User-services
   get_users: async (offset, pageSize, callBack) => {
 
@@ -172,9 +204,7 @@ module.exports = {
 
   add_user: async (body, callBack) => {
 
-
-
-    var qr1 = "INSERT INTO tbl_users (first_name, last_name, email, mobile, password, role_id, updated_by) VALUES (?,?,?,?,?,?,?)";
+    var qr1 = "INSERT INTO tbl_users (first_name, last_name, gender, mobile, email, password, role) VALUES (?,?,?,?,?,?,?)";
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
@@ -182,7 +212,7 @@ module.exports = {
       //await connect_pool.beginTransaction()
       var qr1_res = await new Promise((res, rej) => {
         connect_pool.query(qr1,
-          [body.first_name, body.last_name, body.email, body.mobile, body.password, body.role_id, body.updated_by],
+          [body.first_name, body.last_name,body.gender,body.mobile,body.email,body.password,body.role],
           (row1_err, row1) => {
             if (row1_err) {
               connection.rollback(); return callBack({ status: 0, message: row1_err });
@@ -495,7 +525,7 @@ module.exports = {
               connection.rollback();
               return callBack({ status: 0, message: result1_err });
             }
-            res(results_1);
+            res([results_1]);
           });
       });
       if (qr1_res.length == 0) {
