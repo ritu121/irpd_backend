@@ -22,7 +22,8 @@ const {
   get_skills,
   add_skills,
   update_skills,
-  delete_skills
+  delete_skills,
+  get_searchByDate
 
 } = require("./irpd-service");
 
@@ -499,6 +500,8 @@ module.exports = {
       oldSend.apply(res, arguments);
     }
 
+    console.log(body,"body");
+
     if (body.length < 1) {
       return res.status(201).json({
         status: 0,
@@ -558,6 +561,32 @@ module.exports = {
     }
     try {
       get_searchJob(name, (err, results) => {
+        // console.log(results);
+        if (err) {
+          return res.status(500).json(err);
+        }
+        return res.status(200).json({ "status": 1, data: results[0] });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+
+  getJobbyDate: (req, res) => {
+    // console.log(req.params.id,"id");
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+
+    var oldSend = res.send;
+    res.send = function (response) {
+      // add_log(response)
+      oldSend.apply(res, arguments);
+    }
+    try {
+      get_searchByDate(startDate, endDate, (err, results) => {
         // console.log(results);
         if (err) {
           return res.status(500).json(err);

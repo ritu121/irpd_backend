@@ -24,7 +24,8 @@ const {
   getSkills,
   addSkills,
   updateSkills,
-  deleteSkills
+  deleteSkills,
+  getJobbyDate
 } = require("./irpd-controller");
 
 const multer = require('multer');
@@ -60,6 +61,7 @@ router.delete("/deleteJob", deleteJob);
 
 // ---Search
 router.get("/search", getJobsearch);
+router.get("/searchbydate", getJobbyDate);
 router.get("/roles", getroles);
 
 
