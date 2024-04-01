@@ -499,9 +499,7 @@ module.exports = {
       // add_log(body, response)
       oldSend.apply(res, arguments);
     }
-
-    console.log(body,"body");
-
+    
     if (body.length < 1) {
       return res.status(201).json({
         status: 0,
@@ -663,6 +661,8 @@ module.exports = {
 
   updatecandidateResume: (req, res) => {
     const { originalname, filename,path } = req.file;
+
+  
     const prev_file=req.params.filename
     const body = req.body;
    
@@ -711,8 +711,8 @@ module.exports = {
     } else {
       res.status(404).send('File not found');
     }
-
   },
+  
   getAllCandidateByJob: (req, res) => {
     const id = req.params.job_id;
     var oldSend = res.send;
@@ -835,14 +835,12 @@ module.exports = {
 
     try {
       delete_skills(skill_id, (err, results) => {
-
-        if (err) {
-
+        if(err){
           return res.status(500).json(err);
         }
         return res.status(200).json(results);
       });
-    } catch (error) {
+    } catch(error){
       return res.status(500).json({
         status: 0,
         err: error,
