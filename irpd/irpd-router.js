@@ -25,7 +25,11 @@ const {
   addSkills,
   updateSkills,
   deleteSkills,
-  getJobbyDate
+  getJobbyDate,
+  getSchedule,
+  updateSchedule,
+  addSchedule,
+  deleteSchedule
 } = require("./irpd-controller");
 
 const multer = require('multer');
@@ -79,6 +83,22 @@ router.get("/getSkills", getSkills);
 router.post("/addSkills", addSkills);
 router.patch("/updateSkills/:id", updateSkills);
 router.delete("/deleteSkills/:id", deleteSkills);
+
+//----Skills
+router.get("/getSkills", getSkills);
+router.post("/addSkills", addSkills);
+router.patch("/updateSkills/:id", updateSkills);
+router.delete("/deleteSkills/:id", deleteSkills);
+
+
+//----Schedule
+router.get("/getShedule", getSchedule);
+router.post("/addShedule", addSchedule);
+router.patch("/updateShedule/:id", updateSchedule);
+router.delete("/deleteShedule/:id", deleteSchedule);
+
+
+
 
 
 //----getPreview Experience

@@ -849,5 +849,120 @@ module.exports = {
   },
 
 
+   // Schedule==================================
+
+
+   getSchedule: (req, res) => {
+    var oldSend = res.send;
+
+    res.send = function (response) {
+      // add_log(response)
+      oldSend.apply(res, arguments);
+    }
+
+    try {
+      const page = parseInt(req.query.page) || 1
+      const pageSize = parseInt(req.query.pageSize) || 10
+
+      const offset = (page - 1) * pageSize
+
+      get_schedule((err, results) => {
+
+        if (err) {
+
+          return res.status(500).json(err);
+        }
+
+        return res.status(200).json(results);
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+
+  addSchedule: (req, res) => {
+    const body = req.body;
+    var oldSend = res.send;
+    res.send = function (response) {
+      // add_log(body, response)
+      oldSend.apply(res, arguments);
+    }
+
+    try {
+      add_schedule(body, (err, results) => {
+
+        if (err) {
+          return res.status(500).json({ err });
+        }
+        return res.status(200).json({
+          status: 1,
+          message: "skill Added sucessfully",
+          data: results,
+        });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+
+  },
+
+
+  updateSchedule: (req, res) => {
+    const skill_id = req.params.id;
+    var oldSend = res.send;
+    res.send = function (response) {
+      // add_log(body, response)
+      oldSend.apply(res, arguments);
+    }
+    const body = req.body
+    try {
+      update_schedule(body, skill_id, (err, results) => {
+        if (err) {
+          return res.status(500).json(err);
+        }
+        return res.status(200).json(results);
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+
+
+  deleteSchedule: (req, res) => {
+    const skill_id = req.params.id;
+    var oldSend = res.send;
+
+    res.send = function (response) {
+      // add_log(body, response)
+      oldSend.apply(res, arguments);
+    }
+
+    try {
+      delete_schedule(skill_id, (err, results) => {
+        if(err){
+          return res.status(500).json(err);
+        }
+        return res.status(200).json(results);
+      });
+    } catch(error){
+      return res.status(500).json({
+        status: 0,
+        err: error,
+      });
+    }
+  },
+
+
+
+
 
 }

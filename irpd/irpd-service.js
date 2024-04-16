@@ -1086,6 +1086,163 @@ module.exports = {
       //connection.releaseConnection()
       return callBack({ status: 0, message: err });
     }
+  },
+
+
+
+  // Skills====================================================================
+
+  get_schedule: async (callBack) => {
+
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+
+    try {
+
+      var qr1 = `SELECT * FROM tbl_scheduler`;
+      var qr1_res = await new Promise((res, rej) => {
+        connect_pool.query(qr1,
+          (result1_err, results_1) => {
+            if (result1_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result1_err });
+            }
+            res(results_1);
+          });
+      });
+      if (qr1_res.length == 0) {
+        return callBack({ status: 0, message: "No records found" })
+      }
+      await connection.commit();
+      await connection.end();
+      return callBack(null, qr1_res)
+    }
+    catch (err) {
+      await connection.rollback()
+      // connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  },
+
+
+  add_schedule: async (body, callBack) => {
+    var qr1 = "INSERT INTO tbl_scheduler (skill_name) VALUES (?)";
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+    try {
+
+      //await connect_pool.beginTransaction()
+      var qr1_res = await new Promise((res, rej) => {
+        connect_pool.query(qr1,
+          [body.skill_name],
+          (row1_err, row1) => {
+            if (row1_err) {
+              connection.rollback(); return callBack({ status: 0, message: row1_err });
+            }
+            res(row1);
+          });
+      });
+
+      connection.commit();
+      connection.end();
+      let res_obj = {
+        "result": qr1_res,
+      }
+      return callBack(null, res_obj)
+    } catch (err) {
+      //connection.rollback();
+      //connection.releaseConnection();
+      return callBack({ status: 0, message: err })
+    }
+  },
+
+
+  update_schedule: async (body, skill_id, callBack) => {
+
+    var qr2 = "SELECT * FROM skills WHERE skill_id = ?";
+    var qr4 = "UPDATE skills SET skill_name = ? WHERE skill_id = ?";
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+    try {
+
+      var qr2_res = await new Promise((res, rej) => {
+        connect_pool.query(qr2, [skill_id], (row2_err, row2) => {
+
+          if (row2_err) {
+            connection.rollback(); return callBack({ status: 0, message: row2_err });
+          }
+          res(row2);
+        });
+      });
+      if (qr2_res.length < 1) {
+        return callBack({ status: 0, message: "No user found" });
+      }
+
+      var qr4_res = await new Promise((res, rej) => {
+        connect_pool.query(qr4, [body.skill_name, skill_id],
+          (result4_err, results_4) => {
+
+            if (result4_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result4_err });
+            }
+            res(results_4);
+          });
+      });
+      await connection.commit();
+      await connection.end();
+
+      return callBack(null, { status: 1, message: "You have updated skill sucussesfully" })
+    }
+    catch (err) {
+      await connection.rollback()
+      //connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
+  },
+
+  delete_schedule: async (skill_id, callBack) => {
+
+    var qr2 = "SELECT * FROM skills WHERE skill_id = ?";
+    var qr4 = "DELETE FROM skills WHERE skill_id = ?";
+    const connection = await mysql.createConnection(db_conn);
+    await connection.beginTransaction();
+    try {
+
+      var qr2_res = await new Promise((res, rej) => {
+        connect_pool.query(qr2, [skill_id], (row2_err, row2) => {
+
+          if (row2_err) {
+            connection.rollback(); return callBack({ status: 0, message: row2_err });
+          }
+          res(row2);
+        });
+      });
+      if (qr2_res.length < 1) {
+        return callBack({ status: 0, message: "No user found" });
+      }
+
+      var qr4_res = await new Promise((res, rej) => {
+        connect_pool.query(qr4, [skill_id],
+          (result4_err, results_4) => {
+
+            if (result4_err) {
+              connection.rollback();
+              return callBack({ status: 0, message: result4_err });
+            }
+            res(results_4);
+          });
+      });
+      await connection.commit();
+      await connection.end();
+
+      return callBack(null, { status: 1, message: "Your have deleted the skill sucussesfully" })
+    }
+    catch (err) {
+      await connection.rollback()
+      //connection.releaseConnection()
+      return callBack({ status: 0, message: err });
+    }
   }
 
 
