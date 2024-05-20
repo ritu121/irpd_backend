@@ -1090,10 +1090,9 @@ module.exports = {
 
 
 
-  // Skills====================================================================
+  // Schedule====================================================================
 
   get_schedule: async (callBack) => {
-
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
 
@@ -1126,7 +1125,7 @@ module.exports = {
 
 
   add_schedule: async (body, callBack) => {
-    var qr1 = "INSERT INTO tbl_scheduler (skill_name) VALUES (?)";
+    var qr1 = "INSERT INTO tbl_scheduler (schedule_id,title,start_time,end_time,candidate_id,candidate_name) VALUES (?,?,?,?,?,?)";
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
@@ -1134,7 +1133,7 @@ module.exports = {
       //await connect_pool.beginTransaction()
       var qr1_res = await new Promise((res, rej) => {
         connect_pool.query(qr1,
-          [body.skill_name],
+          [body.schedule_id,body.title,body.start_time,body.end_time,body.candidate_id,body.candidate_name],
           (row1_err, row1) => {
             if (row1_err) {
               connection.rollback(); return callBack({ status: 0, message: row1_err });
@@ -1157,16 +1156,17 @@ module.exports = {
   },
 
 
-  update_schedule: async (body, skill_id, callBack) => {
+  update_schedule: async (body, schedule_id, callBack) => {
 
-    var qr2 = "SELECT * FROM skills WHERE skill_id = ?";
-    var qr4 = "UPDATE skills SET skill_name = ? WHERE skill_id = ?";
+    var qr2 = "SELECT * FROM tbl_scheduler WHERE schedule_id = ?";
+    var qr4 = "UPDATE tbl_scheduler SET title = ?, start_time = ?, end_time = ?, interviewer_name = ? WHERE schedule_id = ?";
+
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
 
       var qr2_res = await new Promise((res, rej) => {
-        connect_pool.query(qr2, [skill_id], (row2_err, row2) => {
+        connect_pool.query(qr2, [schedule_id], (row2_err, row2) => {
 
           if (row2_err) {
             connection.rollback(); return callBack({ status: 0, message: row2_err });
@@ -1179,7 +1179,7 @@ module.exports = {
       }
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [body.skill_name, skill_id],
+        connect_pool.query(qr4, [body.title, body.start_time, body.end_time,body.interviewer_name,schedule_id],
           (result4_err, results_4) => {
 
             if (result4_err) {
@@ -1192,7 +1192,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "You have updated skill sucussesfully" })
+      return callBack(null, { status: 1, message: "You have updated schedule sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
@@ -1201,16 +1201,16 @@ module.exports = {
     }
   },
 
-  delete_schedule: async (skill_id, callBack) => {
+  delete_schedule: async (schedule_id, callBack) => {
 
-    var qr2 = "SELECT * FROM skills WHERE skill_id = ?";
-    var qr4 = "DELETE FROM skills WHERE skill_id = ?";
+    var qr2 = "SELECT * FROM tbl_scheduler  WHERE schedule_id = ?";
+    var qr4 = "DELETE  FROM tbl_scheduler  WHERE schedule_id = ?";
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
 
       var qr2_res = await new Promise((res, rej) => {
-        connect_pool.query(qr2, [skill_id], (row2_err, row2) => {
+        connect_pool.query(qr2, [schedule_id], (row2_err, row2) => {
 
           if (row2_err) {
             connection.rollback(); return callBack({ status: 0, message: row2_err });
@@ -1223,7 +1223,7 @@ module.exports = {
       }
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [skill_id],
+        connect_pool.query(qr4, [schedule_id],
           (result4_err, results_4) => {
 
             if (result4_err) {
@@ -1236,7 +1236,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have deleted the skill sucussesfully" })
+      return callBack(null, { status: 1, message: "Your have deleted the schedule sucussesfully" })
     }
     catch (err) {
       await connection.rollback()

@@ -92,10 +92,10 @@ router.delete("/deleteSkills/:id", deleteSkills);
 
 
 //----Schedule
-router.get("/getShedule", getSchedule);
-router.post("/addShedule", addSchedule);
-router.patch("/updateShedule/:id", updateSchedule);
-router.delete("/deleteShedule/:id", deleteSchedule);
+router.get("/getSchedule", getSchedule);
+router.post("/addSchedule", addSchedule);
+router.patch("/updateSchedule/:id", updateSchedule);
+router.delete("/deleteSchedule/:id", deleteSchedule);
 
 
 

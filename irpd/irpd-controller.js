@@ -23,7 +23,12 @@ const {
   add_skills,
   update_skills,
   delete_skills,
-  get_searchByDate
+  get_searchByDate,
+  get_schedule,
+  add_schedule,
+  update_schedule,
+  delete_schedule
+
 
 } = require("./irpd-service");
 
@@ -899,7 +904,7 @@ module.exports = {
         }
         return res.status(200).json({
           status: 1,
-          message: "skill Added sucessfully",
+          message: "schedule Added sucessfully",
           data: results,
         });
       });
@@ -914,7 +919,7 @@ module.exports = {
 
 
   updateSchedule: (req, res) => {
-    const skill_id = req.params.id;
+    const schedule_id = req.params.id;
     var oldSend = res.send;
     res.send = function (response) {
       // add_log(body, response)
@@ -922,7 +927,7 @@ module.exports = {
     }
     const body = req.body
     try {
-      update_schedule(body, skill_id, (err, results) => {
+      update_schedule(body, schedule_id, (err, results) => {
         if (err) {
           return res.status(500).json(err);
         }
@@ -938,7 +943,7 @@ module.exports = {
 
 
   deleteSchedule: (req, res) => {
-    const skill_id = req.params.id;
+    const schedule_id = req.params.id;
     var oldSend = res.send;
 
     res.send = function (response) {
@@ -947,7 +952,7 @@ module.exports = {
     }
 
     try {
-      delete_schedule(skill_id, (err, results) => {
+      delete_schedule(schedule_id, (err, results) => {
         if(err){
           return res.status(500).json(err);
         }
@@ -960,7 +965,6 @@ module.exports = {
       });
     }
   },
-
 
 
 

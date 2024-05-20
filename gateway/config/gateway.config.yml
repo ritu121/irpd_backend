@@ -2,13 +2,13 @@ http:
   port: 49153
 admin:
   port: 9877
-  host: 192.168.10.157
+  host: 192.168.10.209
 apiEndpoints:
   irpdAPI:
-    paths: ['/userLogin','/getUsers',/getUser/*,'/addUser','/updateUser','/deleteUser','/getJobs','/addJob',
+    paths: ['/userLogin','/getUser',/getUser/*,'/addUser','/updateUser','/deleteUser','/getJobs','/addJob',
     '/updateJob','/deleteJob','/search','/addCandidates','/getCandidates','/updateCandidates','/deleteCandidates/*',
     '/download/*','/addCandidatesResume','/updateCandidatesResume/*','/getPrevious_Exp/*','/getJobByStatus','/getCandidateByJob/*',
-    '/getSkills','/addSkills','/updateSkills/*','/deleteSkills/*','/roles','/searchbydate','/addSchedule','/updateSchedule/*','/deleteSchedule/*','/getSchedule']
+    '/getSkills','/addSkills','/updateSkills/*','/deleteSkills/*','/roles','/searchbydate',/addSchedule','/updateSchedule/*','/deleteSchedule/*','/getSchedule']
 serviceEndpoints:   
   irpdServiceEndPoint:
     url: 'http://${USER_HOST}:${IRPD_PORT}/'
