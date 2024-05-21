@@ -583,7 +583,7 @@ module.exports = {
 
     try {
 
-      var qr1 = `SELECT * FROM tbl_candidates LIMIT ${pageSize} OFFSET ${offset}`;
+      var qr1 = `SELECT * FROM tbl_candidates`;
       var qr1_res = await new Promise((res, rej) => {
         connect_pool.query(qr1,
           (result1_err, results_1) => {
