@@ -23,12 +23,12 @@ const {
   add_skills,
   update_skills,
   delete_skills,
-  get_searchByDate,
   get_schedule,
   add_schedule,
   update_schedule,
-  delete_schedule
+  delete_schedule,
 
+  get_searchByDate
 
 } = require("./irpd-service");
 
@@ -926,6 +926,7 @@ module.exports = {
       oldSend.apply(res, arguments);
     }
     const body = req.body
+
     try {
       update_schedule(body, schedule_id, (err, results) => {
         if (err) {
@@ -965,8 +966,4 @@ module.exports = {
       });
     }
   },
-
-
-
-
 }

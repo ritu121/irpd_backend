@@ -118,3 +118,4 @@ router.get("/getCandidateByJob/:job_id",getAllCandidateByJob)
 
 
 module.exports = router;   
+

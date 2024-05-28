@@ -1,9 +1,11 @@
+
 const connect_pool = require("./config/database");
 const mysql = require('mysql2/promise');
 const https = require('https');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const multer = require('multer')
+const multer = require('multer');
+const { log } = require("console");
 
 require("dotenv").config({ path: "../.env" });
 const db_conn = {
@@ -355,7 +357,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have deleted the user sucussesfully" })
+      return callBack(null, { status: 1, message: "You have deleted the user sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
@@ -565,7 +567,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have deleted the job sucussesfully" })
+      return callBack(null, { status: 1, message: "You have deleted the job sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
@@ -583,7 +585,7 @@ module.exports = {
 
     try {
 
-      var qr1 = `SELECT * FROM tbl_candidates`;
+      var qr1 = `SELECT * FROM tbl_candidates LIMIT ${pageSize} OFFSET ${offset}`;
       var qr1_res = await new Promise((res, rej) => {
         connect_pool.query(qr1,
           (result1_err, results_1) => {
@@ -786,7 +788,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have updated job sucussesfully" })
+      return callBack(null, { status: 1, message: "You have updated job sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
@@ -830,7 +832,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have deleted the candidate sucussesfully" })
+      return callBack(null, { status: 1, message: "You have deleted the candidate sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
@@ -1079,7 +1081,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have deleted the skill sucussesfully" })
+      return callBack(null, { status: 1, message: "You have deleted the skill sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
@@ -1125,7 +1127,7 @@ module.exports = {
 
 
   add_schedule: async (body, callBack) => {
-    var qr1 = "INSERT INTO tbl_scheduler (schedule_id,title,start_time,end_time,candidate_id,candidate_name) VALUES (?,?,?,?,?,?)";
+    var qr1 = "INSERT INTO tbl_scheduler (schedule_id,title,start_time,end_time,candidate_id,candidate_name,job_id) VALUES (?,?,?,?,?,?,?)";
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
@@ -1133,7 +1135,7 @@ module.exports = {
       //await connect_pool.beginTransaction()
       var qr1_res = await new Promise((res, rej) => {
         connect_pool.query(qr1,
-          [body.schedule_id,body.title,body.start_time,body.end_time,body.candidate_id,body.candidate_name],
+          [body.schedule_id,body.title,body.start_time,body.end_time,body.candidate_id,body.candidate_name,body.job_id],
           (row1_err, row1) => {
             if (row1_err) {
               connection.rollback(); return callBack({ status: 0, message: row1_err });
@@ -1158,15 +1160,18 @@ module.exports = {
 
   update_schedule: async (body, schedule_id, callBack) => {
 
+
+    // console.log(body,"ll");
+
     var qr2 = "SELECT * FROM tbl_scheduler WHERE schedule_id = ?";
-    var qr4 = "UPDATE tbl_scheduler SET title = ?, start_time = ?, end_time = ?, interviewer_name = ? WHERE schedule_id = ?";
+    var qr4 = "UPDATE tbl_scheduler SET title = ?, start_time = ?, end_time = ? WHERE schedule_id = ?";
 
     const connection = await mysql.createConnection(db_conn);
     await connection.beginTransaction();
     try {
 
       var qr2_res = await new Promise((res, rej) => {
-        connect_pool.query(qr2, [schedule_id], (row2_err, row2) => {
+        connect_pool.query(qr2, [body.schedule_id], (row2_err, row2) => {
 
           if (row2_err) {
             connection.rollback(); return callBack({ status: 0, message: row2_err });
@@ -1174,12 +1179,14 @@ module.exports = {
           res(row2);
         });
       });
+
+
       if (qr2_res.length < 1) {
         return callBack({ status: 0, message: "No user found" });
       }
 
       var qr4_res = await new Promise((res, rej) => {
-        connect_pool.query(qr4, [body.title, body.start_time, body.end_time,body.interviewer_name,schedule_id],
+        connect_pool.query(qr4, [body.title, body.start_time, body.end_time,body.schedule_id],
           (result4_err, results_4) => {
 
             if (result4_err) {
@@ -1236,7 +1243,7 @@ module.exports = {
       await connection.commit();
       await connection.end();
 
-      return callBack(null, { status: 1, message: "Your have deleted the schedule sucussesfully" })
+      return callBack(null, { status: 1, message: "You have deleted the schedule sucussesfully" })
     }
     catch (err) {
       await connection.rollback()
@@ -1247,6 +1254,3 @@ module.exports = {
 
 
 };
-
-
-
